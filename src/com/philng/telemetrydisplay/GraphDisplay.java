@@ -1,0 +1,118 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.philng.telemetrydisplay;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.general.SeriesException;
+import org.jfree.data.time.Millisecond;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
+/**
+ *
+ * @author phil
+ */
+public class GraphDisplay extends JPanel{
+    /** The time series data. */
+    TimeSeries voltage;   
+    TimeSeries current;   
+    public GraphDisplay() {
+        voltage = new TimeSeries( "Voltage" );
+        current = new TimeSeries( "Current" );
+                
+        this.setLayout( new BorderLayout() );        
+        final JFreeChart chart = createChart(createDatasetVoltage());
+        
+
+        final ChartPanel chartPanel = new ChartPanel(chart);
+        final JButton button = new JButton("Add New Data Item");
+
+        add(chartPanel, BorderLayout.CENTER);
+        chartPanel.setVisible( true );
+        setVisible( true );
+    }
+    
+    private JFreeChart createChart(final XYDataset dataset) {
+        final JFreeChart result = ChartFactory.createTimeSeriesChart(
+            "Telemetry Display", 
+            "Time", 
+            "Voltage",
+            dataset, 
+            true, 
+            true, 
+            false
+        );
+        final XYPlot plot = result.getXYPlot();
+        
+        ValueAxis currentAxis = new NumberAxis();
+        currentAxis.setRange(0,100);
+        currentAxis.setLabel("Current");
+        
+        plot.setRangeAxis(1, currentAxis);
+        plot.setDataset(1, createDatasetCurrent());
+        plot.mapDatasetToRangeAxis(1, 1);
+
+        
+        ValueAxis axis = plot.getDomainAxis();
+        
+        axis.setAutoRange(true);
+        axis = plot.getRangeAxis();
+        axis.setRange(0.0, 12.0); 
+        
+        final XYItemRenderer renderer = plot.getRenderer();
+        renderer.setToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
+        if (renderer instanceof StandardXYItemRenderer) {
+            final StandardXYItemRenderer rr = (StandardXYItemRenderer) renderer;
+            rr.setShapesFilled(true);
+        }
+        
+        final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
+        renderer2.setSeriesPaint(0, Color.GREEN);
+        renderer.setToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
+        plot.setRenderer(1, renderer2);
+        
+        return result;
+    }
+    
+    public void addData(Float v, Float c){
+        try{
+            voltage.add(new Second(), v);
+            current.add(new Second(), c);
+        } catch(SeriesException e){
+            
+        }
+    }
+    
+    public void resetData(){
+        voltage = new TimeSeries("Voltage");
+        current = new TimeSeries("Current");
+    }
+    private XYDataset createDatasetVoltage() {
+        return new TimeSeriesCollection(voltage);
+    }
+    private XYDataset createDatasetCurrent() {
+        return new TimeSeriesCollection(current);
+    }
+}
