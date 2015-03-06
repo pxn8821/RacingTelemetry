@@ -44,7 +44,7 @@ public class GraphDisplay extends JPanel{
     public GraphDisplay() {
         voltage = new TimeSeries( "Voltage" );
         current = new TimeSeries( "Current" );
-                
+
         this.setLayout( new BorderLayout() );        
         final JFreeChart chart = createChart(createDatasetVoltage());
         
@@ -71,6 +71,14 @@ public class GraphDisplay extends JPanel{
             }
         };
         chartPanel.addChartMouseListener(cml);
+    }
+
+    public TimeSeries getVoltageDataset(){
+        return voltage;
+    }
+
+    public TimeSeries getCurrentDataset(){
+        return current;
     }
 
     /**

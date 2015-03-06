@@ -10,8 +10,10 @@ import com.philng.telemetrydisplay.controller.Controller;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.ArrayList;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Main UI
@@ -123,6 +125,11 @@ public class GUI extends javax.swing.JFrame {
         jMenu1.setText("File");
 
         jMenuItem1.setText("Save Data");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem1);
 
         jMenuItem2.setText("Exit");
@@ -193,9 +200,20 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_refreshPortsButtonMouseClicked
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
         System.exit(0);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "csv");
+        fileChooser.setFileFilter(filter);
+
+        if (fileChooser.showSaveDialog(GUI.this) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            controller.saveDataAsCSV(file);
+        }
+
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     public static void main(String[] args) {
 

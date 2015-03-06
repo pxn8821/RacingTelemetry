@@ -8,6 +8,12 @@ package com.philng.telemetrydisplay.controller;
 import com.philng.telemetrydisplay.ConnectionManager.ConnectionManager;
 import com.philng.telemetrydisplay.GUI;
 import com.philng.telemetrydisplay.Serial.SerialReader;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesDataItem;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JFrame;
@@ -59,5 +65,36 @@ public class Controller {
      */
     public void clearData(){
         ui.graphDisplay.resetData();
+    }
+
+    /**
+     * Save the file as a CSV
+     * @param file
+     */
+    public void saveDataAsCSV(File file){
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write("time,voltage,current\n");
+
+            TimeSeries voltage = ui.graphDisplay.getVoltageDataset();
+            TimeSeries current = ui.graphDisplay.getCurrentDataset();
+
+            for(int i = 0; i<voltage.getItemCount(); i++){
+                TimeSeriesDataItem currVoltage = voltage.getDataItem(i);
+                TimeSeriesDataItem currCurrent = current.getDataItem(i);
+
+                writer.write(currVoltage.getPeriod().toString() + ',');
+
+                writer.write(currVoltage.getValue().toString() + ',');
+                writer.write(currCurrent.getValue().toString());
+
+                writer.write('\n');
+            }
+
+            writer.close();
+        } catch(IOException e){
+            System.err.println("Error saving file:" + e.getMessage());
+        }
+
     }
 }
