@@ -9,28 +9,34 @@ import com.philng.telemetrydisplay.Serial.SerialReader;
 import com.philng.telemetrydisplay.controller.Controller;
 
 /**
- *
+ * Manages the serial bluetooth connection
  * @author phil
  */
 public class ConnectionManager {
-   private static ConnectionManager instance = null;
-   private Controller controller;
-   private ConnectionChecker checker = new ConnectionChecker();
-   
-   private boolean isConnected = false;
-   public boolean connectIntent = false;
-   public boolean threadStarted = false;
-   public String portName;
-   
-   private long lastSeen;
+    // Singleton reference
+    private static ConnectionManager instance = null;
 
-    public ConnectionChecker getChecker() {
-        return checker;
-    }
+    // Reference to the controller object
+    private Controller controller;
 
-    public void setChecker(ConnectionChecker checker) {
-        this.checker = checker;
-    }
+    // Connection checker thread
+    private ConnectionChecker checker = new ConnectionChecker();
+
+    // Whether the connection is successful or not
+    private boolean isConnected = false;
+
+    // The state that the user intents to be in
+    public boolean connectIntent = false;
+
+    // Wheather monitoring thread is started or not
+    public boolean threadStarted = false;
+
+    // Serial terminal port name
+    public String portName;
+
+    // Last seen data
+    private long lastSeen;
+
 
     public long getLastSeen() {
         return lastSeen;
@@ -39,22 +45,34 @@ public class ConnectionManager {
     public void setLastSeen(long lastSeen) {
         this.lastSeen = lastSeen;
     }
-   
-   protected ConnectionManager() {
-       
-   }
-   public static ConnectionManager getInstance() {
+
+    protected ConnectionManager() {}
+
+    /**
+     * Get the ConnectionManager instance
+     * @return
+     */
+    public static ConnectionManager getInstance() {
       if(instance == null) {
          instance = new ConnectionManager();
       }
       return instance;
-   }
-    
-   public void setController(Controller c){
+    }
+
+    /**
+     * Set the controller's reference object
+     * @param c
+     */
+    public void setController(Controller c){
        this.controller = c;
        SerialReader.getInstance().setController(c);
-   }
+    }
 
+    /**
+     * Set the connection intent to be true,
+     * also starts up the thread checker if not already started
+     * @return
+     */
     public boolean connect(){
         if(!threadStarted){
             (new Thread(checker)).start();
@@ -63,8 +81,12 @@ public class ConnectionManager {
         connectIntent = true;
         return true;
     }
-   
-   public void setIsConnected(boolean isConnected){
+
+    /**
+     * Sets whether the connection is actually connected or not
+     * @param isConnected
+     */
+    public void setIsConnected(boolean isConnected){
        this.isConnected = isConnected;
        if(isConnected){
            controller.ui.connectSerialButton.setText("Disconnect");
@@ -73,14 +95,19 @@ public class ConnectionManager {
            controller.ui.connectSerialButton.setText("Connect");
            controller.ui.statusLabel.setText("Disconnected");
        }
-   }
-   
-   public void setLabel(String label){
+    }
+
+    /**
+     * Set the UI Label
+     * @param label
+     */
+    public void setLabel(String label){
        controller.ui.statusLabel.setText(label);
-   }
-   public boolean getIsConnected(){
+    }
+
+    public boolean getIsConnected(){
        return this.isConnected;
-   }
+    }
    
    
 }

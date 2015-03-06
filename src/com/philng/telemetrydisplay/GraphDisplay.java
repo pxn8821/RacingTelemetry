@@ -12,9 +12,8 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
+
+import org.jfree.chart.*;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
@@ -37,7 +36,11 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class GraphDisplay extends JPanel{
     /** The time series data. */
     TimeSeries voltage;   
-    TimeSeries current;   
+    TimeSeries current;
+
+    /**
+     * Build all the initial data
+     */
     public GraphDisplay() {
         voltage = new TimeSeries( "Voltage" );
         current = new TimeSeries( "Current" );
@@ -47,55 +50,84 @@ public class GraphDisplay extends JPanel{
         
 
         final ChartPanel chartPanel = new ChartPanel(chart);
-        final JButton button = new JButton("Add New Data Item");
 
         add(chartPanel, BorderLayout.CENTER);
         chartPanel.setVisible( true );
         setVisible( true );
+
+        // Add a mouse listener for when the user double clicks the mousse
+        // on the graph, it will reset the zoome
+        ChartMouseListener cml = new ChartMouseListener() {
+            @Override
+            public void chartMouseClicked(ChartMouseEvent chartMouseEvent) {
+                if(chartMouseEvent.getTrigger().getClickCount() == 2){
+                    chartPanel.restoreAutoBounds();
+                }
+            }
+
+            @Override
+            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) {
+
+            }
+        };
+        chartPanel.addChartMouseListener(cml);
     }
-    
+
+    /**
+     * Create the chart itself with datasets
+     * @param dataset
+     * @return
+     */
     private JFreeChart createChart(final XYDataset dataset) {
         final JFreeChart result = ChartFactory.createTimeSeriesChart(
-            "Telemetry Display", 
-            "Time", 
+            "Telemetry Display",
+            "Time",
             "Voltage",
-            dataset, 
-            true, 
-            true, 
+            dataset,
+            true,
+            true,
             false
         );
         final XYPlot plot = result.getXYPlot();
-        
+
+        // Add in a new y axis for current
         ValueAxis currentAxis = new NumberAxis();
         currentAxis.setRange(0,100);
         currentAxis.setLabel("Current");
-        
+
         plot.setRangeAxis(1, currentAxis);
         plot.setDataset(1, createDatasetCurrent());
         plot.mapDatasetToRangeAxis(1, 1);
 
-        
+        // Set information for the x axis (time)
         ValueAxis axis = plot.getDomainAxis();
-        
         axis.setAutoRange(true);
+
+        // Set the information for the voltage axis
         axis = plot.getRangeAxis();
-        axis.setRange(0.0, 12.0); 
-        
+        axis.setAutoRange(false);
+        axis.setRange(0.0, 12.0);
+
         final XYItemRenderer renderer = plot.getRenderer();
         renderer.setToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
         if (renderer instanceof StandardXYItemRenderer) {
             final StandardXYItemRenderer rr = (StandardXYItemRenderer) renderer;
             rr.setShapesFilled(true);
         }
-        
+
         final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
         renderer2.setSeriesPaint(0, Color.GREEN);
         renderer.setToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
         plot.setRenderer(1, renderer2);
-        
+
         return result;
     }
-    
+
+    /**
+     * Add data to the chart, this function ignores all errors
+     * @param v voltage
+     * @param c current
+     */
     public void addData(Float v, Float c){
         try{
             voltage.add(new Second(), v);
@@ -104,14 +136,27 @@ public class GraphDisplay extends JPanel{
             
         }
     }
-    
+
+    /**
+     * Clear all the data in the thread
+     */
     public void resetData(){
-        voltage = new TimeSeries("Voltage");
-        current = new TimeSeries("Current");
+        voltage.clear();
+        current.clear();
     }
+
+    /**
+     * Creates the voltage dataset
+     * @return
+     */
     private XYDataset createDatasetVoltage() {
         return new TimeSeriesCollection(voltage);
     }
+
+    /**
+     * Create the current dataset
+     * @return
+     */
     private XYDataset createDatasetCurrent() {
         return new TimeSeriesCollection(current);
     }

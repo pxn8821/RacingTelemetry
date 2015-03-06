@@ -11,9 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import javax.swing.AbstractAction;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  *
@@ -48,8 +46,17 @@ public class GUI extends javax.swing.JFrame {
         connectSerialButton.addActionListener(connectListener);
         ResetAction resetListener = new ResetAction();
         resetButton.addActionListener(resetListener);
+        refreshPortsButtonMouseClicked(null);
+        getPreferredSerialPort();
     }
 
+    public void getPreferredSerialPort(){
+        for(int i = 0; i<jComboBox3.getModel().getSize();i++){
+            if( ((String) jComboBox3.getModel().getElementAt(i)).contains("tty.RNBT")){
+                jComboBox3.setSelectedIndex(i);
+            }
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -157,7 +164,6 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBox3ActionPerformed
 
     private void refreshPortsButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshPortsButtonMouseClicked
-        // TODO add your handling code here:
         jComboBox3.removeAllItems();
         ArrayList<String> ports = SerialReader.getInstance().getAvailablePorts();
         for(String s : ports){
@@ -171,10 +177,34 @@ public class GUI extends javax.swing.JFrame {
         
             @Override
             public void run() {
-                Controller controller = new Controller();
+                try {
+                    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) {
+                            UIManager.setLookAndFeel(info.getClassName());
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    // If Nimbus is not available, you can set the GUI to another look and feel.
+                }
+
+
+                final Controller controller = new Controller();
                 GUI ex = new GUI(controller);
                 ex.setVisible(true);
                 controller.setUI(ex);
+
+                // Disconnect if connected while exiting application
+                Runtime.getRuntime().addShutdownHook(new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        System.out.println("Application Exiting");
+                        controller.disconnectPort();
+                    }
+                });
+
             }
         });
     }
