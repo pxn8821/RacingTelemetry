@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 /**
+ * Imeplementation of RXTX reading data from a serial terminal
+ * This class handles the connection and disconnection of the serial terminal
  * Created by phil on 3/3/15.
  */
 public class SerialReader {
@@ -25,11 +27,11 @@ public class SerialReader {
     private CommPort commPort;
     private Controller controller;
     private static final String PORT_NAMES[] = {
-            "/dev/tty.usbmodem", // Mac OS X
-//        "/dev/usbdev", // Linux
-//        "/dev/tty", // Linux
-//        "/dev/serial", // Linux
-//        "COM3", // Windows
+              "/dev/tty.usbmodem", // Mac OS X
+    //        "/dev/usbdev", // Linux
+    //        "/dev/tty", // Linux
+    //        "/dev/serial", // Linux
+    //        "COM3", // Windows
     };
 
     private BufferedReader input;
@@ -44,7 +46,11 @@ public class SerialReader {
     Thread isThread;
     InputStream in;
     DataStreamReader DSR;
-            
+
+    /**
+     * Get a list of all the available ports
+     * @return
+     */
     public ArrayList<String> getAvailablePorts(){
         ArrayList<String> returnList = new ArrayList<String>();
         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
@@ -60,7 +66,12 @@ public class SerialReader {
         
         return returnList;
     }
-    
+
+    /**
+     * Open and connect to the COM port
+     * @param portName device name
+     * @return
+     */
     public boolean connect ( String portName ) {
         try{
             CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
@@ -86,7 +97,8 @@ public class SerialReader {
                     System.out.println("StopBits: " + serialPort.getStopBits());
                     System.out.println("Parity: " + serialPort.getParity());
                     System.out.println("FlowControl: " + serialPort.getFlowControlMode());
-                    
+
+                    // Once opened, add in the input streams
                     in = serialPort.getInputStream();
                     DSR = new DataStreamReader(in, controller);
                     isThread = (new Thread(DSR));
@@ -106,22 +118,25 @@ public class SerialReader {
         
         return false;
     }
-    
-    public SerialReader(){
-        
-    }
-    
+
+    /**
+     * Set the controller reference object
+     * @param c
+     */
     public void setController(Controller c){
         this.controller = c;
     }
-    
+
     public static SerialReader getInstance(){
         if(instance == null){
             instance = new SerialReader();
         }
         return instance;
     }
-    
+
+    /**
+     * Disconnect the input streams and also the port itself
+     */
     public void disconnect(){
         try{
             in.close();
@@ -132,9 +147,5 @@ public class SerialReader {
         } catch(Exception e){
             
         }
-    }
-    
-    public void Serial(){
-
     }
 }
