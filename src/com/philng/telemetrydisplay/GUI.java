@@ -73,6 +73,10 @@ public class GUI extends javax.swing.JFrame {
         dataPanel = new javax.swing.JPanel();
         statusLabel = new javax.swing.JLabel();
         resetButton = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Racing Telemetry Viewer");
@@ -111,10 +115,27 @@ public class GUI extends javax.swing.JFrame {
         );
         dataPanelLayout.setVerticalGroup(
             dataPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 249, Short.MAX_VALUE)
+            .addGap(0, 227, Short.MAX_VALUE)
         );
 
         resetButton.setText("Reset Data");
+
+        jMenu1.setText("File");
+
+        jMenuItem1.setText("Save Data");
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Exit");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -171,6 +192,11 @@ public class GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_refreshPortsButtonMouseClicked
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
     public static void main(String[] args) {
 
         EventQueue.invokeLater(new Runnable() {
@@ -178,14 +204,11 @@ public class GUI extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                        if ("Nimbus".equals(info.getName())) {
-                            UIManager.setLookAndFeel(info.getClassName());
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    // If Nimbus is not available, you can set the GUI to another look and feel.
+                    System.setProperty("apple.laf.useScreenMenuBar", "true");
+                    System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Racing Telemetry");
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch(Exception e){
+
                 }
 
 
@@ -246,6 +269,10 @@ public class GUI extends javax.swing.JFrame {
     public javax.swing.JButton connectSerialButton;
     private javax.swing.JPanel dataPanel;
     private javax.swing.JComboBox jComboBox3;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JButton refreshPortsButton;
     private javax.swing.JButton resetButton;
