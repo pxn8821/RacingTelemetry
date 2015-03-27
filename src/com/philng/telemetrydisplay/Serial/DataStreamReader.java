@@ -52,6 +52,7 @@ public class DataStreamReader implements Runnable {
             while ( ( len = this.in.read(buffer)) > -1  && !stop)
             {
                 String data = new String(buffer,0,len);
+                System.out.println(data);
                 bufferData = bufferData + data;
                 if(bufferData.contains("\n")){
                     bufferData.replace("\n", "");

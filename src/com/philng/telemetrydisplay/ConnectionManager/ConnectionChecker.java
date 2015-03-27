@@ -49,6 +49,8 @@ public class ConnectionChecker implements Runnable{
                     } else {
                         connMan.setLabel("Trying to connect");
                         SerialReader.getInstance().connect(connMan.portName);
+                        ConnectionManager.getInstance().setIsConnected(true);
+                        break;
                     }
 
                 } else {

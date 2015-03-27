@@ -37,8 +37,6 @@ public class SerialReader {
     private BufferedReader input;
     private OutputStream output;
 
-    private static final int TIME_OUT = 1000; // Port open timeout
-    private static final int DATA_RATE = 9600; // Arduino serial port
 
     private SerialPort serialPort = null;
     private CommPortIdentifier portId = null;
@@ -79,18 +77,21 @@ public class SerialReader {
                 System.out.println("Error: Port is currently in use");
             } else {
                 System.out.println("Connect 1/2");
+
+
                 commPort = portIdentifier.open(this.getClass().getName(),6000);
+                serialPort = (SerialPort) commPort;
 
                 if ( commPort instanceof SerialPort )
                 {
                     System.out.println("Connect 2/2");
-                    serialPort = (SerialPort) commPort;
+
                     System.out.println("BaudRate: " + serialPort.getBaudRate());
                     System.out.println("DataBIts: " + serialPort.getDataBits());
                     System.out.println("StopBits: " + serialPort.getStopBits());
                     System.out.println("Parity: " + serialPort.getParity());
                     System.out.println("FlowControl: " + serialPort.getFlowControlMode());
-                    serialPort.setSerialPortParams(4800,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_ODD);
+                    serialPort.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
                     serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN);
                     System.out.println("BaudRate: " + serialPort.getBaudRate());
                     System.out.println("DataBIts: " + serialPort.getDataBits());
